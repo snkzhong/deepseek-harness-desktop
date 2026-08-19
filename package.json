@@ -5,7 +5,10 @@
   "private": true,
   "type": "module",
   "main": "./out/main/index.js",
-  "author": "snkzhong",
+  "author": {
+    "name": "snkzhong",
+    "email": "snkzhong@163.com"
+  },
   "license": "MIT",
   "engines": {
     "node": "^22.19.0 || >=24.0.0"
