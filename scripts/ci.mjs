@@ -63,6 +63,8 @@ function precheck() {
 function stageCheck() {
   npmRun('typecheck')
   npmRun('test')
+  // smoke 检查的是 out/ 产物;CI 全新 checkout 没有,必须先 build(本机已有则增量秒过)
+  npmRun('build')
   npmRun('smoke')
 }
 
