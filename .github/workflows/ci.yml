@@ -24,7 +24,7 @@ jobs:
       - run: node scripts/ci.mjs check
 
   package:
-    name: Package ${{ matrix.name }}
+    name: Package (${{ matrix.name }})
     if: startsWith(github.ref, 'refs/tags/v')
     needs: check
     runs-on: ${{ matrix.runs-on }}
