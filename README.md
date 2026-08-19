@@ -81,8 +81,6 @@ npm run ci -- check  # typecheck + 测试 + 冒烟
 npm run ci -- package --mac
 ```
 
-CI、打包与发布流程见 [scripts/ci.mjs](scripts/ci.mjs) 与 [`.github/workflows/ci.yml`](.github/workflows/ci.yml);架构决策见 [AGENTS.md](../AGENTS.md)。
-
 ## 特别感谢
 
 - [deepseek-ai/deepseek-harness](https://github.com/deepseek-ai/deepseek-harness) —— 官方内核,本项目的一切能力来自它
