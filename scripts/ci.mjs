@@ -75,7 +75,8 @@ function stagePackage(args) {
   const builderArgs = platformArg === undefined ? [] : [platformArg]
   if (args.includes('--dir')) builderArgs.push('--dir')
   builderArgs.push('--publish', 'never')
-  run(IS_WIN ? 'electron-builder.cmd' : 'npx', ['electron-builder', ...builderArgs])
+  // npx 解析 node_modules/.bin(Windows 上 .cmd shim 不在 PATH,npx 三平台通用)
+  run('npx', ['electron-builder', ...builderArgs])
 }
 
 function findAppResources(dir) {
