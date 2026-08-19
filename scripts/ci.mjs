@@ -71,10 +71,9 @@ function stageCheck() {
 function stagePackage(args) {
   npmRun('fetch:kernel')
   npmRun('build')
-  const platformArg = ['--mac', '--win', '--linux'].find((flag) => args.includes(flag))
-  const builderArgs = platformArg === undefined ? [] : [platformArg]
-  if (args.includes('--dir')) builderArgs.push('--dir')
-  builderArgs.push('--publish', 'never')
+  // 平台 + 架构一起透传(--mac --x64 等);未指定时 electron-builder 用本机默认
+  const passthrough = args.filter((flag) => ['--mac', '--win', '--linux', '--arm64', '--x64', '--dir'].includes(flag))
+  const builderArgs = [...passthrough, '--publish', 'never']
   // npx 解析 node_modules/.bin(Windows 上 .cmd shim 不在 PATH,npx 三平台通用)
   run('npx', ['electron-builder', ...builderArgs])
 }

@@ -34,7 +34,10 @@ jobs:
         include:
           - name: mac-arm64
             runs-on: macos-latest
-            args: --mac
+            args: --mac --arm64
+          - name: mac-x64
+            runs-on: macos-latest
+            args: --mac --x64
           - name: win-x64
             runs-on: windows-latest
             args: --win

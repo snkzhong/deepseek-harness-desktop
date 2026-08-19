@@ -21,6 +21,7 @@ DeepSeek Harness Desktop 把 [DeepSeek Harness](https://github.com/deepseek-ai/d
 | 平台 | 下载 | 安装方式 |
 | --- | --- | --- |
 | macOS (Apple Silicon) | [DMG](https://github.com/snkzhong/deepseek-harness-desktop/releases/latest/download/deepseek-harness-desktop-mac-arm64.dmg) | 打开 DMG,拖入 Applications;首次打开前需在终端执行(未签名应用需解除隔离):<br>`xattr -cr "/Applications/DeepSeek Harness Desktop.app"` |
+| macOS (Intel) | [DMG](https://github.com/snkzhong/deepseek-harness-desktop/releases/latest/download/deepseek-harness-desktop-mac-x64.dmg) | 同上,首次打开前执行:<br>`xattr -cr "/Applications/DeepSeek Harness Desktop.app"` |
 | Windows x64 | [安装程序](https://github.com/snkzhong/deepseek-harness-desktop/releases/latest/download/deepseek-harness-desktop-win-x64.exe) | 运行 NSIS 安装程序并按提示完成安装 |
 | Linux x64 | [AppImage](https://github.com/snkzhong/deepseek-harness-desktop/releases/latest/download/deepseek-harness-desktop-linux-x86_64.AppImage) · [deb](https://github.com/snkzhong/deepseek-harness-desktop/releases/latest/download/deepseek-harness-desktop-linux-amd64.deb) | AppImage 直接运行;deb 用包管理器安装 |
 
