@@ -1,0 +1,51 @@
+appId: io.github.snkzhong.deepseek-harness-desktop
+productName: DeepSeek Harness Desktop
+directories:
+  output: dist
+  buildResources: resources
+files:
+  - out/**/*
+  - package.json
+asar: true
+compression: maximum
+# 参考 third/deepseek-harness-desktop:显式关闭原生依赖重编译,避免 electron-builder 重写 extraResources 里的 node_modules
+npmRebuild: false
+electronLanguages:
+  - en-US
+  - zh-CN
+extraResources:
+  - from: resources/splash.html
+    to: splash.html
+  - from: resources/tray-icon.png
+    to: tray-icon.png
+  - from: build/dsh-pkg-extracted
+    to: dsh-pkg
+    filter:
+      - '**/*'
+mac:
+  category: public.app-category.developer-tools
+  icon: resources/icon.png
+  hardenedRuntime: true
+  gatekeeperAssess: false
+  target:
+    - dmg
+    - zip
+win:
+  icon: resources/icon.png
+  verifyUpdateCodeSignature: false
+  target:
+    - target: nsis
+      arch: [x64]
+linux:
+  icon: resources/icon.png
+  category: Development
+  target:
+    - AppImage
+    - deb
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: DeepSeek Harness Desktop
+artifactName: deepseek-harness-desktop-${os}-${arch}.${ext}

@@ -1,0 +1,84 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #17161a;
+  color: #f5f4f7;
+}
+
+main.wizard,
+main.diagnostics,
+.boot {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px;
+}
+
+.logo {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #4d6bfe, #7a5cff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 22px;
+  color: #fff;
+}
+
+h1 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.phase,
+.message,
+.restarts,
+.exported {
+  font-size: 13px;
+  color: #a8a4b3;
+  margin: 0;
+  max-width: 480px;
+  text-align: center;
+}
+
+.logs {
+  max-width: 640px;
+  width: 100%;
+  max-height: 240px;
+  overflow: auto;
+  background: #100f13;
+  border: 1px solid #2a2931;
+  border-radius: 8px;
+  padding: 12px;
+  font-size: 11px;
+  line-height: 1.5;
+  color: #d7d4de;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+button {
+  background: #4d6bfe;
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 13px;
+  padding: 8px 18px;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #3f5af5;
+}

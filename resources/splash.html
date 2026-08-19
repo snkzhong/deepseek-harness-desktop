@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 本地静态 splash,无外部内容/用户输入;进度 JS 为内联脚本,故放行 unsafe-inline -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'unsafe-inline'; style-src 'unsafe-inline'" />
+    <title>DeepSeek Harness Desktop</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        height: 100%;
+        background: #17161a;
+        color: #f5f4f7;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        overflow: hidden;
+        user-select: none;
+      }
+      .app {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        padding: 28px 36px;
+        position: relative;
+      }
+
+      /* 背景光晕呼吸动画 */
+      .app::before {
+        content: "";
+        position: absolute;
+        width: 340px; height: 340px;
+        border-radius: 50%;
+        background: radial-gradient(circle, rgba(77,107,254,.18), transparent 65%);
+        animation: breathe 4s ease-in-out infinite;
+        pointer-events: none;
+      }
+      @keyframes breathe {
+        0%, 100% { transform: scale(1); opacity: .7; }
+        50% { transform: scale(1.15); opacity: 1; }
+      }
+
+      .logo {
+        width: 64px; height: 64px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, #4d6bfe, #7a5cff);
+        display: flex; align-items: center; justify-content: center;
+        font-weight: 700; font-size: 26px; color: #fff;
+        box-shadow: 0 8px 28px rgba(77,107,254,.35);
+        animation: pulse 2.4s ease-in-out infinite;
+        z-index: 1;
+      }
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.06); }
+      }
+
+      h1 { font-size: 15px; font-weight: 600; margin: 4px 0 0; z-index: 1; letter-spacing: .2px; }
+
+      /* 阶段清单 */
+      .stages {
+        width: 100%;
+        max-width: 320px;
+        margin-top: 10px;
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        z-index: 1;
+      }
+      .stage {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 12px;
+        color: #5f5b6b;
+        transition: color .3s;
+      }
+      .stage .dot {
+        width: 16px; height: 16px;
+        border-radius: 50%;
+        border: 1.5px solid #3a3844;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+        transition: border-color .3s, background .3s;
+        font-size: 10px;
+      }
+      .stage.active { color: #c9c6d4; }
+      .stage.active .dot { border-color: #4d6bfe; }
+      .stage.active .dot::after {
+        content: "";
+        width: 7px; height: 7px;
+        border-radius: 50%;
+        background: #4d6bfe;
+        animation: blink 1s ease-in-out infinite;
+      }
+      @keyframes blink { 0%,100% { opacity: 1; } 50% { opacity: .25; } }
+      .stage.done { color: #8b8896; }
+      .stage.done .dot {
+        border-color: #3ecf8e;
+        background: #3ecf8e;
+      }
+      .stage.done .dot::after { content: "✓"; color: #10241b; font-weight: 700; font-size: 10px; animation: none; }
+
+      /* 进度条 */
+      .progress-track {
+        width: 100%;
+        max-width: 320px;
+        height: 4px;
+        border-radius: 2px;
+        background: #26242e;
+        overflow: hidden;
+        margin-top: 8px;
+        z-index: 1;
+      }
+      .progress-fill {
+        height: 100%;
+        width: 0%;
+        border-radius: 2px;
+        background: linear-gradient(90deg, #4d6bfe, #7a5cff);
+        transition: width .25s ease;
+      }
+      .progress-fill.indeterminate {
+        width: 30%;
+        animation: slide 1.2s ease-in-out infinite;
+      }
+      @keyframes slide {
+        0% { margin-left: -30%; }
+        100% { margin-left: 100%; }
+      }
+
+      .message {
+        font-size: 11.5px;
+        color: #8b8796;
+        min-height: 15px;
+        margin-top: 2px;
+        z-index: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 380px;
+      }
+      .error { color: #ff7a90; }
+    </style>
+  </head>
+  <body>
+    <div class="app">
+      <div class="logo">D</div>
+      <h1>DeepSeek Harness Desktop</h1>
+      <div class="stages" id="stages"></div>
+      <div class="progress-track"><div class="progress-fill" id="fill"></div></div>
+      <div class="message" id="message">Starting…</div>
+    </div>
+    <script>
+      // 阶段顺序是 UI 结构;文案经 IPC 从主进程取(单一事实源:i18n 字典只在 locales/dicts/)。
+      const STAGE_ORDER = [
+        'node-check', 'node-download', 'node-extract',
+        'kernel-latest', 'kernel-download',
+        'kernel-extract', 'kernel-deps', 'spawn', 'health'
+      ]
+      const ORDER = Object.fromEntries(STAGE_ORDER.map((id, i) => [id, i]))
+
+      const stagesEl = document.getElementById('stages')
+      const fillEl = document.getElementById('fill')
+      const messageEl = document.getElementById('message')
+
+      function renderStages(labels) {
+        stagesEl.innerHTML = ''
+        for (const id of STAGE_ORDER) {
+          const row = document.createElement('div')
+          row.className = 'stage'
+          row.dataset.stage = id
+          const dot = document.createElement('span')
+          dot.className = 'dot'
+          const label = document.createElement('span')
+          label.textContent = labels[id] ?? id
+          row.appendChild(dot)
+          row.appendChild(label)
+          stagesEl.appendChild(row)
+        }
+        if (currentStage !== null) applyStage(currentStage)
+      }
+
+      let currentStage = null
+
+      function applyStage(stageId) {
+        currentStage = stageId
+        const current = ORDER[stageId]
+        if (current === undefined) return
+        for (const [id, index] of Object.entries(ORDER)) {
+          const row = stagesEl.querySelector(`[data-stage="${id}"]`)
+          if (row === null) continue
+          row.classList.toggle('done', index < current)
+          row.classList.toggle('active', index === current)
+        }
+      }
+
+      function applyProgress(progress) {
+        applyStage(progress.stage)
+
+        if (progress.indeterminate) {
+          fillEl.className = 'progress-fill indeterminate'
+        } else if (progress.totalBytes !== undefined && progress.totalBytes > 0) {
+          fillEl.className = 'progress-fill'
+          fillEl.style.width = `${Math.min(100, (progress.receivedBytes / progress.totalBytes) * 100).toFixed(1)}%`
+        } else if (progress.receivedBytes !== undefined) {
+          fillEl.className = 'progress-fill'
+          fillEl.style.width = '100%'
+        }
+
+        if (progress.message !== undefined) messageEl.textContent = progress.message
+      }
+
+      if (window.dshDesktop !== undefined && window.dshDesktop.splash !== undefined) {
+        window.dshDesktop.splash.onProgress(applyProgress)
+        window.dshDesktop.app
+          .getStageLabels()
+          .then(renderStages)
+          .catch(() => renderStages({}))
+      } else {
+        renderStages({})
+      }
+    </script>
+  </body>
+</html>

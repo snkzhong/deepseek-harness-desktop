@@ -1,0 +1,43 @@
+{
+  "name": "deepseek-harness-desktop",
+  "version": "0.1.0",
+  "description": "A cross-platform Electron thin shell for DeepSeek Harness (dsh).",
+  "private": true,
+  "type": "module",
+  "main": "./out/main/index.js",
+  "author": "snkzhong",
+  "license": "MIT",
+  "engines": {
+    "node": "^22.19.0 || >=24.0.0"
+  },
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "electron-vite build",
+    "preview": "electron-vite preview",
+    "typecheck": "tsc --noEmit -p tsconfig.node.json && tsc --noEmit -p tsconfig.web.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "package:dir": "node scripts/fetch-kernel.mjs && npm run build && electron-builder --dir",
+    "package:mac": "node scripts/fetch-kernel.mjs && npm run build && electron-builder --mac --publish never",
+    "package:win": "node scripts/fetch-kernel.mjs && npm run build && electron-builder --win --x64 --publish never",
+    "smoke": "node scripts/smoke.mjs",
+    "fetch:kernel": "node scripts/fetch-kernel.mjs",
+    "ci": "node scripts/ci.mjs"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.9"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.0",
+    "@vitejs/plugin-react": "^4.6.0",
+    "electron": "^37.2.0",
+    "electron-builder": "^26.1.0",
+    "electron-vite": "^4.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "@types/react": "^18.3.12",
+    "@types/react-dom": "^18.3.1",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.4"
+  }
+}
